@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
 import { useAccount, useReadContract, useReadContracts } from "wagmi";
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from "@/lib/contract";
+import type { Address } from "viem";
 
 export default function RecentTransactions() {
   const { address: merchant } = useAccount();
@@ -11,7 +12,7 @@ export default function RecentTransactions() {
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     functionName: "getPaymentCount",
-    args: merchant ? [merchant] : undefined,
+    args: merchant ? [merchant as Address] : undefined, // cast merchant
   });
 
   const count = Number(txCount ?? 0);
@@ -24,7 +25,7 @@ export default function RecentTransactions() {
           abi: CONTRACT_ABI,
           address: CONTRACT_ADDRESS,
           functionName: "getPayment",
-          args: [merchant, start + idx],
+          args: [merchant as Address, BigInt(start + idx)], // cast + BigInt
         }))
       : [],
   });
@@ -35,7 +36,7 @@ export default function RecentTransactions() {
       ?.map((result, i) => {
         if (!result.result) return null;
         const [payer, amount, timestamp] = result.result as [
-          string,
+          Address,
           bigint,
           bigint
         ];
@@ -47,7 +48,8 @@ export default function RecentTransactions() {
           date: new Date(Number(timestamp) * 1000).toLocaleDateString(),
         };
       })
-      .filter(Boolean)
+      // ✅ type guard removes null
+      .filter((tx): tx is NonNullable<typeof tx> => Boolean(tx))
       .reverse() ?? [];
 
   return (
