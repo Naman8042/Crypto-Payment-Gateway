@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from '@/generated/prisma';
+import { prisma } from '@/lib/prisma';
 import bcrypt from "bcryptjs";
 
-
-const prisma = new PrismaClient();
 
 // Register user
 export async function POST(req: NextRequest) {
