@@ -43,4 +43,6 @@ next-env.d.ts
 /src/generated/prisma
 
 
+/app/generated/prisma
+
 /prisma/migrations
